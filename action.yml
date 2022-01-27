@@ -1,0 +1,34 @@
+name: 'Set Git Branch'
+author: Joshua Estrin Skrzypek <https://github.com/jskrzypek>
+description: |
+  Sets the git branch name as a consistent env var & output. If the event is 
+  triggered by a tag, no value will be set.
+branding:
+  icon: git-branch
+  color: orange
+outputs:
+  branch-name:
+    description: "The branch name"
+    value: ${{ env.GIT_BRANCH }}
+runs:
+  using: "composite"
+  steps:
+    - name: Set Git branch name on PR
+      id: branch-name-from-pr
+      if: |-
+        github.event_name == 'pull_request'
+        || github.event_name == 'pull_request_target'
+      run: |
+        echo "GIT_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
+        echo "::set-output name=branch-name::${{ github.head_ref }}"
+      shell: bash
+    - name: Set Env Vars on non-PR branch events
+      id: branch-name-from-non-pr
+      if: |-
+        github.event_name != 'pull_request'
+        && github.event_name != 'pull_request_target'
+        && github.ref_type == 'branch'
+      run: |
+        echo "GIT_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+        echo "::set-output name=branch-name::${{ github.head_ref }}"
+      shell: bash
