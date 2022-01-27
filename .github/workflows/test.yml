@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Git Branch
+        id: set-git-branch
+        uses: jskrzypek/set-git-branch-action@0.1.0-pre
+      - name: Check that env var was set
+        id: test-env-var
+        run: |
+          echo "The branch name from the environment is \"$GIT_BRANCH\""
+          if [[ -z $GIT_BRANCH ]]; then
+            echo "GIT_BRANCH env var unset!"
+            exit 1
+          fi
+      - name: Check that output was set
+        id: test-ouput
+        run: |
+          echo "The branch name from the output is \"${{ steps.set-git-branch.outputs.branch-name }}\""
+          if [[ -z ${{ steps.set-git-branch.outputs.branch-name }} ]]; then
+            echo "branch-name output unset!"
+            exit 1
+          fi
