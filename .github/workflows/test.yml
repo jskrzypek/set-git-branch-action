@@ -17,6 +17,10 @@ jobs:
       - name: Set Git Branch
         id: set-git-branch
         uses: jskrzypek/set-git-branch-action@0.1.0-pre.1
+      - name: Show Outputs
+        id: show-outputs
+        run: |
+          echo "${{ toJSON(steps) }}"
       - name: Check that env var was set
         id: test-env-var
         run: |

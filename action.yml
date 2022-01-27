@@ -35,3 +35,8 @@ runs:
       run: |
         echo "::set-output name=branch-name::${{ env.GIT_BRANCH }}"
       shell: bash
+    - name: Show Outputs
+      id: show-outputs
+      run: |
+        echo "${{ toJSON(steps) }}"
+      shell: bash
