@@ -9,20 +9,19 @@ branding:
 outputs:
   branch-name:
     description: "The branch name"
-    value: ${{ env.GIT_BRANCH }}
+    value: ${{ steps.set-output.branch-name }}
 runs:
   using: "composite"
   steps:
-    - name: Set Git branch name on PR
+    - name: Set Git Branch Name for PR Events
       id: branch-name-from-pr
       if: |-
         github.event_name == 'pull_request'
         || github.event_name == 'pull_request_target'
       run: |
         echo "GIT_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-        echo "::set-output name=branch-name::${{ github.head_ref }}"
       shell: bash
-    - name: Set Env Vars on non-PR branch events
+    - name: Set Git Branch Name for non-PR Branch Events
       id: branch-name-from-non-pr
       if: |-
         github.event_name != 'pull_request'
@@ -30,5 +29,9 @@ runs:
         && github.ref_type == 'branch'
       run: |
         echo "GIT_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
-        echo "::set-output name=branch-name::${{ github.head_ref }}"
+      shell: bash
+    - name: Set output from env var
+      id: set-output
+      run: |
+        echo "::set-output name=branch-name::$GIT_BRANCH"
       shell: bash
